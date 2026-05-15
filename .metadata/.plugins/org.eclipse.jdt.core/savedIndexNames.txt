@@ -1,7 +1,0 @@
-INDEX VERSION 1.134+C:\Mani-4852\Spring boot Projects\.metadata\.plugins\org.eclipse.jdt.core
-35693530.index
-433205292.index
-1865797976.index
-3282692275.index
-3834243246.index
-2794828174.index
