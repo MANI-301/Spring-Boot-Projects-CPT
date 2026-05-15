@@ -1,0 +1,50 @@
+package com.app.service;
+
+import com.app.entity.Product;
+import com.app.exception.ResourceNotFoundException;
+import com.app.repository.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.List;
+
+@Service
+public class ProductService {
+
+    @Autowired
+    private ProductRepository repository;
+
+    public Product createProduct(Product product) {
+        return repository.save(product);
+    }
+
+    public Product getProductById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+    }
+
+    public List<Product> getAllProducts() {
+        return repository.findAll();
+    }
+
+    public Product updateProduct(Long id, Product productDetails) {
+        Product product = getProductById(id);
+        product.setName(productDetails.getName());
+        product.setPrice(productDetails.getPrice());
+        product.setQuantity(productDetails.getQuantity());
+        return repository.save(product);
+    }
+
+    public void deleteProduct(Long id) {
+        Product product = getProductById(id);
+        repository.delete(product);
+    }
+
+    // 🔥 SEARCH METHODS
+    public List<Product> searchByName(String name) {
+        return repository.findByNameContainingIgnoreCase(name);
+    }
+
+    public List<Product> priceGreaterThan(Double price) {
+        return repository.findByPriceGreaterThan(price);
+    }
+}

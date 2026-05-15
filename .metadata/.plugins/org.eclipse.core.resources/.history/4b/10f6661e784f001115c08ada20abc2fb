@@ -1,0 +1,71 @@
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.app.dto.EmployeeRequest;
+import com.app.dto.EmployeeRequest;
+import com.app.entity.Employee;
+import com.app.exception.ResourceNotFoundException;
+import com.app.repository.EmployeeRepository;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class EmployeeService {
+
+    private final EmployeeRepository employeeRepository;
+
+    @Transactional
+    public Employee createEmployee(EmployeeRequest request) {
+        Employee employee = new Employee();
+        employee.setName(request.getName());
+        employee.setDepartment(request.getDepartment());
+        employee.setSalary(request.getSalary());
+        return employeeRepository.save(employee);
+    }
+
+    public Employee getEmployeeById(Long id) {
+        return employeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", id));
+    }
+
+    @Transactional
+    public Employee updateEmployee(Long id, EmployeeRequest request) {
+        Employee employee = getEmployeeById(id);
+        employee.setName(request.getName());
+        employee.setDepartment(request.getDepartment());
+        employee.setSalary(request.getSalary());
+        return employeeRepository.save(employee);
+    }
+
+    @Transactional
+    public void deleteEmployee(Long id) {
+        Employee employee = getEmployeeById(id);
+        employeeRepository.delete(employee);
+    }
+
+    public List<Employee> getEmployeesByDepartment(String department) {
+        return employeeRepository.findByDepartment(department);
+    }
+
+    public List<Employee> getEmployeesBySalaryGreaterThan(Double salary) {
+        return employeeRepository.findBySalaryGreaterThan(salary);
+    }
+
+    @Transactional
+    public int updateEmployeeSalary(Long id, Double salary) {
+        Employee employee = getEmployeeById(id);
+        int updatedRows = employeeRepository.updateEmployeeSalary(id, salary);
+        if (updatedRows == 0) {
+            throw new ResourceNotFoundException("Employee", "id", id);
+        }
+        return updatedRows;
+    }
+
+    public List<Employee> getAllEmployees() {
+        return employeeRepository.findAll();
+    }
+}

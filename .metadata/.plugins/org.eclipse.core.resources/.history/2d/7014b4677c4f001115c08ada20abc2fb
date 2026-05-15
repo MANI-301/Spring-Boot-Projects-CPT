@@ -1,0 +1,80 @@
+
+package com.app.entity;
+
+
+package com.example.employeemanagement.entity;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+
+@Entity
+@Table(name = "employees")
+public class Employee {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @NotBlank(message = "Name is required")
+    @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
+    @Column(nullable = false)
+    private String name;
+    
+    @NotBlank(message = "Department is required")
+    @Size(min = 2, max = 50, message = "Department must be between 2 and 50 characters")
+    @Column(nullable = false)
+    private String department;
+    
+    @NotNull(message = "Salary is required")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Salary must be greater than 0")
+    @Column(nullable = false)
+    private Double salary;
+    
+    // ✅ 1. DEFAULT CONSTRUCTOR (REQUIRED BY JPA)
+    public Employee() {}
+    
+    // ✅ 2. ALL GETTERS
+    public Long getId() {
+        return id;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public String getDepartment() {
+        return department;
+    }
+    
+    public Double getSalary() {
+        return salary;
+    }
+    
+    // ✅ 3. ALL SETTERS
+    public void setId(Long id) {
+        this.id = id;
+    }
+    
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+    
+    public void setSalary(Double salary) {
+        this.salary = salary;
+    }
+    
+    // ✅ 4. toString() for debugging
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", department='" + department + '\'' +
+                ", salary=" + salary +
+                '}';
+    }
+}

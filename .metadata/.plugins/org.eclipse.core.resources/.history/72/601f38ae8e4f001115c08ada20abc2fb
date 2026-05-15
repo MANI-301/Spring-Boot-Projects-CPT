@@ -1,0 +1,94 @@
+package com.app.service;
+
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.app.dto.EmployeeRequest;
+import com.app.dto.EmployeeResponse;
+import com.app.entity.Employee;
+import com.app.repository.EmployeeRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class EmployeeService {  // ❌ REMOVED @RequiredArgsConstructor
+    
+    private final EmployeeRepository employeeRepository;
+    
+    // ✅ EXPLICIT CONSTRUCTOR INJECTION
+    public EmployeeService(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
+    }
+    
+    @Transactional
+    public EmployeeResponse createEmployee(EmployeeRequest request) {
+        Employee employee = new Employee();
+        employee.setName(request.getName());
+        employee.setDepartment(request.getDepartment());
+        employee.setSalary(request.getSalary());
+        
+        Employee saved = employeeRepository.save(employee);
+        return mapToResponse(saved);
+    }
+    
+    public EmployeeResponse getEmployeeById(Long id) {
+        Employee employee = findEmployeeById(id);
+        return mapToResponse(employee);
+    }
+    
+    @Transactional
+    public EmployeeResponse updateEmployee(Long id, EmployeeRequest request) {
+        Employee employee = findEmployeeById(id);
+        employee.setName(request.getName());
+        employee.setDepartment(request.getDepartment());
+        employee.setSalary(request.getSalary());
+        
+        Employee updated = employeeRepository.save(employee);
+        return mapToResponse(updated);
+    }
+    
+    @Transactional
+    public void deleteEmployee(Long id) {
+        Employee employee = findEmployeeById(id);
+        employeeRepository.delete(employee);
+    }
+    
+    public List<EmployeeResponse> getEmployeesByDepartment(String department) {
+        return employeeRepository.findByDepartment(department)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+    
+    public List<EmployeeResponse> getEmployeesBySalaryGreaterThan(Double salary) {
+        return employeeRepository.findBySalaryGreaterThan(salary)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+    
+    @Transactional
+    public EmployeeResponse updateEmployeeSalary(Long id, Double salary) {
+        int updatedRows = employeeRepository.updateEmployeeSalary(id, salary);
+        if (updatedRows == 0) {
+            throw new RuntimeException("Employee not found with id: " + id);
+        }
+        return getEmployeeById(id);
+    }
+    
+    private Employee findEmployeeById(Long id) {
+        return employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
+    }
+    
+    private EmployeeResponse mapToResponse(Employee employee) {
+        EmployeeResponse response = new EmployeeResponse();
+        response.setId(employee.getId());
+        response.setName(employee.getName());
+        response.setDepartment(employee.getDepartment());
+        response.setSalary(employee.getSalary());
+        return response;
+    }
+}
